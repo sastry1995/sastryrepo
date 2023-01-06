@@ -1,0 +1,148 @@
+{
+	"name": "DF_ADVANCED_JOINS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_CUST",
+						"type": "DatasetReference"
+					},
+					"name": "cust"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_ORDER",
+						"type": "DatasetReference"
+					},
+					"name": "order"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_INDIA",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_USA",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_OTHERS",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          c_id as integer,",
+				"          c_name as string,",
+				"          contact as string,",
+				"          country as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> cust",
+				"source(output(",
+				"          c_id as integer,",
+				"          ordername as string,",
+				"          orderdate as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> order",
+				"cust select(mapColumn(",
+				"          cust_c_id = c_id,",
+				"          c_name,",
+				"          contact,",
+				"          country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"order select(mapColumn(",
+				"          order_c_id = c_id,",
+				"          ordername,",
+				"          orderdate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select1, select2 join(cust_c_id == order_c_id,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 filter(isNull(order_c_id)) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          c_id = cust_c_id,",
+				"          c_name,",
+				"          contact,",
+				"          country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"select3 sort(asc(c_id, true)) ~> sort1",
+				"sort1 split(equals(country,'india'),",
+				"     equals(country,'usa'),",
+				"     disjoint: false) ~> split1@(india, usa, others)",
+				"split1@india sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('roundRobin', 3)) ~> sink1",
+				"split1@usa sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['usa.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink2",
+				"split1@others sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['others.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink3"
+			]
+		}
+	}
+}

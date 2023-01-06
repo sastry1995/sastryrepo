@@ -1,0 +1,50 @@
+{
+	"name": "DS_ASQL_SCD1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASQL_KEY",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "csurrkey",
+				"type": "varchar"
+			},
+			{
+				"name": "cid",
+				"type": "varchar"
+			},
+			{
+				"name": "cname",
+				"type": "varchar"
+			},
+			{
+				"name": "manager",
+				"type": "varchar"
+			},
+			{
+				"name": "city",
+				"type": "varchar"
+			},
+			{
+				"name": "start_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "update_date",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DIM_CUST"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

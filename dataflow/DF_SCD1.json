@@ -1,0 +1,68 @@
+{
+	"name": "DF_SCD1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ADLS_SCD1",
+						"type": "DatasetReference"
+					},
+					"name": "custcsv"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_ASQL_SCD1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "md5hash"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          cid as integer,",
+				"          cname as string,",
+				"          manager as string,",
+				"          city as string,",
+				"          start_date as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> custcsv",
+				"custcsv derive(csurrkey = md5(concat(toString(cid),cname,manager,city,toString(start_date)))) ~> md5hash",
+				"md5hash alterRow(upsertIf(true())) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          csurrkey as string,",
+				"          cid as string,",
+				"          cname as string,",
+				"          manager as string,",
+				"          city as string,",
+				"          start_date as timestamp,",
+				"          update_date as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['cid'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

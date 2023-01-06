@@ -1,0 +1,37 @@
+{
+	"name": "DS_ADLS_CRIC_ORDERS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_KEY",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "order_cric.csv",
+				"fileSystem": "orders"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "orderid",
+				"type": "String"
+			},
+			{
+				"name": "ordername",
+				"type": "String"
+			},
+			{
+				"name": "orderdate",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

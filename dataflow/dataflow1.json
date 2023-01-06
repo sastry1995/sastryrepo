@@ -1,0 +1,123 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_match1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_match2",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_match3",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_series",
+						"type": "DatasetReference"
+					},
+					"name": "source4"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_series",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "union1"
+				},
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "union2"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          match as integer,",
+				"          playerid as integer,",
+				"          playername as string,",
+				"          playerscore as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          match as integer,",
+				"          playerid as integer,",
+				"          playername as string,",
+				"          playerscore as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"source(output(",
+				"          match as integer,",
+				"          playerid as integer,",
+				"          playername as string,",
+				"          playerscore as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source3",
+				"source(output(",
+				"          match as integer,",
+				"          playerid as integer,",
+				"          playername as string,",
+				"          playerscore as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source4",
+				"source1, source2, source3 union(byName: true)~> union1",
+				"union1, source4 exists(equals(union1@match,source4@match)&&equals(union1@playerid, source4@playerid)&&equals(union1@playername,source4@playername)&&equals(union1@playerscore, source4@playerscore),",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"exists1, source4 union(byName: true,",
+				"     partitionBy('hash', 1))~> union2",
+				"union2 sort(asc(match, true),",
+				"     asc(playerid, true),",
+				"     partitionBy('hash', 1)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          match as string,",
+				"          playerid as string,",
+				"          playername as string,",
+				"          playerscore as string",
+				"     ),",
+				"     partitionFileNames:['output.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

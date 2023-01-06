@@ -1,0 +1,40 @@
+{
+	"name": "DS_match2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "match2"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "match",
+				"type": "String"
+			},
+			{
+				"name": "playerid",
+				"type": "String"
+			},
+			{
+				"name": "playername",
+				"type": "String"
+			},
+			{
+				"name": "playerscore",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

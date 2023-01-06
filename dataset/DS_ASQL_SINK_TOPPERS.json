@@ -1,0 +1,17 @@
+{
+	"name": "DS_ASQL_SINK_TOPPERS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "toppers"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

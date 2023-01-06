@@ -1,0 +1,9 @@
+{
+	"name": "dattu-demo",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "efbf803c-fc60-41e8-95d3-a59a357f4169",
+		"tenantId": "13c73718-38c6-4421-aed4-2265d946195d"
+	}
+}

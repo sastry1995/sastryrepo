@@ -1,0 +1,180 @@
+{
+	"name": "DF_CREDIT",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_ASQL_SOURCE_CREDITSCORE",
+						"type": "DatasetReference"
+					},
+					"name": "creditsource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_ASQL_SINK_DUPLICATE",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_ASQL_SINK_TOPPERS",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_ASQL_ALLCUST",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "windowgeneraaterownumber"
+				},
+				{
+					"name": "filterduplicates"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "filterunique"
+				},
+				{
+					"name": "select2"
+				},
+				{
+					"name": "windowrankanddenserank"
+				},
+				{
+					"name": "sort2"
+				},
+				{
+					"name": "splittopprezs"
+				},
+				{
+					"name": "select3"
+				},
+				{
+					"name": "select4"
+				},
+				{
+					"name": "sort3"
+				},
+				{
+					"name": "sort4"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          cid as integer,",
+				"          ctype as string,",
+				"          cname as string,",
+				"          cscore as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> creditsource",
+				"creditsource window(over(ctype,",
+				"          cname,",
+				"          cscore),",
+				"     asc(cid, true),",
+				"     row_number = rowNumber()) ~> windowgeneraaterownumber",
+				"windowgeneraaterownumber filter(greaterOrEqual(row_number,2)) ~> filterduplicates",
+				"filterduplicates select(mapColumn(",
+				"          cid,",
+				"          ctype,",
+				"          cname,",
+				"          cscore",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sort(asc(cid, true),",
+				"     partitionBy('hash', 1)) ~> sort1",
+				"windowgeneraaterownumber filter(equals(row_number,1)) ~> filterunique",
+				"filterunique select(mapColumn(",
+				"          cid,",
+				"          ctype,",
+				"          cname,",
+				"          cscore",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
+				"select2 window(over(ctype),",
+				"     desc(cscore, true),",
+				"     rank = rank(),",
+				"          denserank = denseRank(),",
+				"          row_number = rowNumber()) ~> windowrankanddenserank",
+				"windowrankanddenserank sort(asc(denserank, true)) ~> sort2",
+				"sort2 split(equals(denserank,1),",
+				"     disjoint: true) ~> splittopprezs@(toppers, allcustomers)",
+				"splittopprezs@toppers select(mapColumn(",
+				"          cid,",
+				"          ctype,",
+				"          cname,",
+				"          cscore",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select3",
+				"splittopprezs@allcustomers select(mapColumn(",
+				"          cid,",
+				"          ctype,",
+				"          cname,",
+				"          cscore",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select4",
+				"select4 sort(asc(cid, true),",
+				"     partitionBy('hash', 1)) ~> sort3",
+				"select3 sort(asc(cid, true),",
+				"     partitionBy('hash', 1)) ~> sort4",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1",
+				"sort4 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     partitionBy('hash', 1)) ~> sink2",
+				"sort3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     partitionBy('hash', 1)) ~> sink3"
+			]
+		}
+	}
+}

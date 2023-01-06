@@ -1,0 +1,17 @@
+{
+	"name": "DS_ASQL_LOOKUP",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ASQL_KEY",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "custorders"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
