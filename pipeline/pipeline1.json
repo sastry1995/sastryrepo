@@ -3,26 +3,13 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Until1",
-				"type": "Until",
+				"name": "Wait1",
+				"type": "Wait",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"timeout": "0.12:00:00"
+					"waitTimeInSeconds": 10
 				}
-			},
-			{
-				"name": "Filter1",
-				"type": "Filter",
-				"dependsOn": [
-					{
-						"activity": "Until1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": []
 			}
 		],
 		"annotations": []
