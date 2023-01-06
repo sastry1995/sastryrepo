@@ -1,0 +1,9 @@
+{
+	"name": "dfbindu",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "c1115fa0-8b34-4528-99eb-700ac66e837c",
+		"tenantId": "13c73718-38c6-4421-aed4-2265d946195d"
+	}
+}
