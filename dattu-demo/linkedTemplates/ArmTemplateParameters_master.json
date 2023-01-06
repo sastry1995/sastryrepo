@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "dattu-demo"
+		},
+		"LS_ADLS_accountKey": {
+			"value": ""
+		},
+		"LS_ADLS_2_accountKey": {
+			"value": ""
+		},
+		"LS_ASQL_connectionString": {
+			"value": ""
+		},
+		"LS_ADLS_properties_typeProperties_url": {
+			"value": "https://dattuadls.dfs.core.windows.net/"
+		},
+		"LS_ADLS_2_properties_typeProperties_url": {
+			"value": "https://dattugen2.dfs.core.windows.net/"
+		},
+		"LS_ADLS_KEY_properties_typeProperties_url": {
+			"value": "https://dattugen2.dfs.core.windows.net"
+		},
+		"LS_AKV_properties_typeProperties_baseUrl": {
+			"value": "https://dattu.vault.azure.net/"
+		},
+		"LS_ASQL_KEY_properties_typeProperties_connectionString_secretName": {
+			"value": "sqlkey"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
